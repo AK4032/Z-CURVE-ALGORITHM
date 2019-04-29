@@ -1,0 +1,58 @@
+import time
+start = time.time()
+
+def FrequentWordsWithMismatchesAndReverseComplements(Genome, k, t):
+    frequency = {}
+    for i in range(len(Genome)-k+1):
+        for string in [Genome[i:i+k],ReverseComplement(Genome[i:i+k])]:
+            for neighbor in NeighborCount(string, t):
+                if neighbor not in frequency:
+                    frequency[neighbor] = 0
+                frequency[neighbor] += 1
+    for kmer in frequency:
+        if frequency[kmer] == max(frequency.values()):
+            location = list(frequency.values()).index(frequency[kmer])
+            return kmer, location
+
+def NeighborCount(Genome, t):
+    if t == 0:
+        return [Genome]
+    if len(Genome) == 1:
+        return ['A','C','G','T']
+    out = []
+    for neighbor in NeighborCount(Genome[1:],t):
+        if HammingDistance(Genome[1:],neighbor) < t:
+            out.extend(['A'+neighbor,'C'+neighbor,'G'+neighbor,'T'+neighbor])
+        else:
+            out.append(Genome[0] + neighbor)
+    return out
+
+def HammingDistance(Genome1, Genome2):
+    count = 0
+    Genome1 = list(Genome1)
+    Genome2 = list(Genome2)
+    for i in range(len(Genome1)):
+        if Genome1[i] != Genome2[i]:
+            count += 1
+    return count
+
+def ReverseComplement(Genome):
+    Genome = list(Genome)
+    Genome = Genome[::-1]
+    for i in range(len(Genome)):
+        if Genome[i] == "A":
+            Genome[i] = "T"
+        elif Genome[i] == "C":
+            Genome[i] = "G"
+        elif Genome[i] == "G":
+            Genome[i] = "C"
+        elif Genome[i] == "T":
+            Genome[i] = "A"
+    return "".join(Genome)
+
+f = open("Tremblaya Princeps.txt","r")
+contents = f.read()
+print(FrequentWordsWithMismatchesAndReverseComplements(contents, 9, 3))
+
+end = time.time()
+print(end - start)
